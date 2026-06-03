@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10201c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ETHOS Perinatal">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icono-192.png">
+<title>ETHOS Perinatal — Código Rojo / HPP v0.1</title>
+<!-- Fuentes del sistema (offline; sin dependencias online) -->
+<style>
+:root{
+  --bg:#0f1413; --sf:#172120; --bgw:#10201c; --bd:#2a3a37; --bdl:#22302d;
+  --tx:#e6efec; --ts:#cfe0db; --tt:#8aa39c; --br:#1f9e83; --brs:#10302a;
+  --red:#e5534b; --red-bg:#2a1413; --green:#2fa36b; --green-bg:#0f2a1e;
+  --yellow:#d9a441; --yellow-bg:#2a2310; --blue:#3d8bd6; --blue-bg:#10202e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;font-size:14px}
+header{position:sticky;top:0;background:#0b100f;border-bottom:1px solid var(--bd);padding:10px 16px;display:flex;align-items:center;gap:10px;z-index:10}
+.logo{width:30px;height:30px;border-radius:7px;background:var(--br);color:#04110d;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px}
+.brand{font-weight:800;letter-spacing:.5px}
+.ver{font-size:10px;background:var(--brs);color:var(--br);padding:2px 7px;border-radius:5px}
+.wrap{max-width:920px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:8px;margin:14px 0}
+.tab{flex:1;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--sf);cursor:pointer;text-align:center;font-weight:700}
+.tab.active{border-color:var(--br);background:var(--brs);color:var(--br)}
+.disclaimer{background:var(--yellow-bg);border:1px solid #4a3c14;color:#e9d39b;border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:12px;line-height:1.5}
+.card{background:var(--sf);border:1px solid var(--bdl);border-radius:10px;padding:14px;margin:12px 0}
+.card-title{font-weight:800;font-size:15px;margin-bottom:4px}
+.card-sub{font-size:12px;color:var(--tt);margin-bottom:8px}
+h3{font-size:14px;color:var(--br);margin:14px 0 6px}
+label.fld{display:block;font-size:12px;color:var(--tt);margin:8px 0 3px}
+input,select{width:100%;padding:9px;border:1px solid var(--bd);border-radius:7px;background:var(--bgw);color:var(--tx);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.toggle{display:inline-flex;align-items:center;gap:6px;background:var(--bgw);border:1px solid var(--bd);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:13px;margin:4px 6px 4px 0}
+.bs{background:var(--br);color:#04110d;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:700;font-size:14px}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;margin-right:6px}
+.res{border-radius:8px;padding:12px;margin-top:10px;font-size:13px;line-height:1.6}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+td,th{border:1px solid var(--bdl);padding:6px 8px;text-align:left;vertical-align:top}
+.callout{background:var(--blue-bg);border-radius:7px;padding:10px 12px;margin:10px 0;font-size:13px;line-height:1.55}
+.step{background:var(--bgw);border-left:3px solid var(--br);border-radius:6px;padding:10px 12px;margin:8px 0;font-size:13px;line-height:1.55}
+.evid{color:var(--br);cursor:pointer;text-decoration:underline;font-size:11px}
+.caso{background:var(--bgw);border:1px solid var(--bdl);border-radius:8px;padding:12px;margin:10px 0}
+.opt{border:2px solid var(--bd);background:var(--sf);border-radius:8px;padding:9px 11px;margin:6px 0;cursor:pointer;font-size:13px}
+.opt.correct{border-color:var(--green);background:var(--green-bg)}
+.opt.wrong{border-color:var(--red);background:var(--red-bg)}
+.fb{display:none;margin-top:8px;background:var(--green-bg);border-left:4px solid var(--green);padding:9px 11px;border-radius:6px;font-size:12.5px;line-height:1.5}
+.fb.active{display:block}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.active{display:flex}
+.modal-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;max-width:560px;width:100%;max-height:85vh;overflow:auto;padding:18px}
+.modal-link{display:inline-block;margin-top:10px;color:var(--br);font-weight:700}
+.foot{font-size:11px;color:var(--tt);text-align:center;padding:20px 0}
+.bad{color:var(--red);font-weight:700}.good{color:var(--green);font-weight:700}.warn{color:var(--yellow);font-weight:700}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header><div class="logo">P</div><div class="brand">ETHOS Perinatal</div><span class="ver">Código Rojo · HPP v0.1</span></header>
+<div class="wrap">
+  <div class="disclaimer">⚠️ <strong>PROTOTIPO EN VALIDACIÓN</strong> — Apoyo a la decisión, no reemplaza el juicio clínico ni el protocolo institucional vigente. Hemorragia obstétrica: actuar en equipo. <strong>Si la paciente está peor que lo que reflejan los campos, manda la clínica</strong> (los campos no capturan todo). Alineado con FIGO 2022, WOMAN (Lancet 2017), E-MOTIVE (NEJM 2023), RCOG GTG-52 y Guía Perinatal MINSAL Chile 2015 (referencia local). Validación institucional pendiente.</div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-cr" onclick="setTab('cr')">🩸 Código Rojo (apoyo)</div>
+    <div class="tab" id="tab-she" onclick="setTab('she')">🤰 Preeclampsia / SHE</div>
+    <div class="tab" id="tab-sep" onclick="setTab('sep')">🦠 Sepsis obstétrica</div>
+    <div class="tab" id="tab-ap" onclick="setTab('ap')">📖 Aprender</div>
+  </div>
+
+  <div id="panel-cr">
+    <div class="card">
+      <div class="card-title">1 · Reconocer y activar</div>
+      <div class="card-sub">HPP = pérdida ≥500 mL (vaginal) o ≥1000 mL (cesárea), o cualquier sangrado con repercusión hemodinámica. El índice de shock (FC/PAS) detecta hipovolemia antes que la PA.</div>
+      <div class="grid">
+        <div><label class="fld">Vía de parto</label><select id="via"><option value="vaginal">Vaginal</option><option value="cesarea">Cesárea</option></select></div>
+        <div><label class="fld">Pérdida estimada (mL)</label><input id="perdida" type="number" placeholder="ej. 1200"></div>
+        <div><label class="fld">FC (lpm)</label><input id="fc" type="number" placeholder="ej. 120"></div>
+        <div><label class="fld">PAS (mmHg)</label><input id="pas" type="number" placeholder="ej. 85"></div>
+      </div>
+      <button class="bs" style="margin-top:12px" onclick="runCR()">Evaluar</button>
+      <div id="cr-res"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">2 · Causa — las 4 T</div>
+      <div class="card-sub">Identificar la causa guía el tratamiento. <span class="evid" onclick="openRef('figo2022')">FIGO 2022 ↗</span></div>
+      <table><thead><tr><th>Causa (frecuencia)</th><th>Acción dirigida</th></tr></thead><tbody>
+        <tr><td><strong>Tono</strong> — atonía uterina (~70%)</td><td>Masaje uterino bimanual + uterotónicos (ver tarjeta 4)</td></tr>
+        <tr><td><strong>Trauma</strong> — desgarros, hematoma, rotura</td><td>Revisión del canal; reparación quirúrgica</td></tr>
+        <tr><td><strong>Tejido</strong> — retención de restos/placenta</td><td>Extracción manual / legrado; descartar acretismo</td></tr>
+        <tr><td><strong>Trombina</strong> — coagulopatía</td><td>Corregir factores/fibrinógeno; TXA; ver tarjeta 6</td></tr>
+      </tbody></table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">3 · Bundle de primera respuesta E-MOTIVE</div>
+      <div class="card-sub">Detección temprana + paquete aplicado en conjunto: ‑60% en HPP grave. <span class="evid" onclick="openRef('emotive')">E-MOTIVE NEJM 2023 ↗</span></div>
+      <div class="step"><strong>M</strong> — Masaje uterino</div>
+      <div class="step"><strong>O</strong> — Oxitócicos (uterotónicos, tarjeta 4)</div>
+      <div class="step"><strong>T</strong> — Ácido tranexámico (tarjeta 5)</div>
+      <div class="step"><strong>I</strong> — Fluidos IV (cristaloides; evitar sobre-reanimación)</div>
+      <div class="step"><strong>V</strong> — Examen (las 4 T: buscar y tratar la causa)</div>
+      <div class="step"><strong>E</strong> — Escalada (tarjeta 7) si no responde</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">4 · Uterotónicos</div>
+      <div class="card-sub">Marca las condiciones del caso para filtrar contraindicaciones. <span class="evid" onclick="openRef('figo2022')">FIGO 2022 ↗</span> <span class="evid" onclick="openRef('rcog52')">RCOG 52 ↗</span></div>
+      <span class="toggle"><input type="checkbox" id="htn" onchange="runUtero()"> HTA / preeclampsia</span>
+      <span class="toggle"><input type="checkbox" id="asma" onchange="runUtero()"> Asma</span>
+      <div id="utero-res"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">5 · Ácido tranexámico (TXA)</div>
+      <div class="callout"><strong>1 g IV en 10 min, lo antes posible y dentro de las 3 h</strong> del inicio del sangrado. Segunda dosis de 1 g si el sangrado continúa tras 30 min o reaparece en 24 h. Reduce la mortalidad por HPP. <span class="evid" onclick="openRef('woman')">WOMAN Lancet 2017 ↗</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">6 · Transfusión y coagulación</div>
+      <div class="card-sub">En hemorragia masiva, reanimación de control de daños.</div>
+      <div class="step"><strong>El fibrinógeno es prioritario en HPP</strong>: cae precozmente. Medirlo pronto y mantener <strong>&gt;2 g/L (200 mg/dL)</strong> con crioprecipitado o concentrado de fibrinógeno; no esperar a la hemorragia masiva para corregirlo. <span class="evid" onclick="openRef('rcog52')">RCOG 52 ↗</span></div>
+      <div class="step">Esquema inicial <strong>1:1:1</strong> (GR:plasma:plaquetas) como <strong>control de daños</strong>. <span class="warn">La proporción 1:1:1 proviene de evidencia en <strong>trauma</strong> (PROPPR), no obstétrica; en HPP la corrección se guía por el <strong>fibrinógeno</strong> y, si está disponible, por viscoelastometría (ROTEM/TEG).</span> <span class="evid" onclick="openRef('proppr')">PROPPR (trauma) ↗</span></div>
+      <div class="step">Vigilar el <strong>calcio iónico (&gt;0.9 mmol/L)</strong> por el citrato; calentar; evitar acidosis (tríada letal).</div>
+      <div class="callout">💉 <strong>Dosis transfusionales exactas</strong> (GR, plasma, plaquetas, crio, fibrinógeno, MTP): usa <strong>ETHOS·TX</strong>. <strong>Plan B si ETHOS·TX no está disponible:</strong> activar Transfusión Masiva con la UMT según el protocolo institucional y el pack de emergencia local.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">7 · Escalada (si no responde al manejo médico)</div>
+      <div class="callout" style="background:var(--red-bg)">🚨 <strong>Regla de no-demora:</strong> si el sangrado <strong>no responde</strong> a uterotónicos + TXA o persiste pese a las medidas iniciales, <strong>escala de inmediato</strong> y avisa a pabellón, anestesia y UMT. <strong>Sospecha causa quirúrgica</strong> (acretismo, trauma del canal, rotura uterina, restos retenidos): no se controla con fármacos.</div>
+      <div class="step">1. <strong>Taponamiento con balón intrauterino</strong> (Bakri): 83–95% de éxito; rápido y conservador. <span class="evid" onclick="openRef('figo2022')">FIGO 2022 ↗</span></div>
+      <div class="step">2. <strong>Suturas de compresión uterina</strong> (B-Lynch).</div>
+      <div class="step">3. <strong>Ligadura arterial</strong> (uterina / hipogástrica) o embolización (si disponible).</div>
+      <div class="step">4. <strong>Histerectomía</strong> — recurso final, no demorarla en hemorragia incoercible.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">8 · Cronología del Código Rojo (0–5–10–20–30 min)</div>
+      <div class="step"><strong>Min 0</strong> — Reconocer y anunciar «Código Rojo», anotar la hora, asignar líder y roles.</div>
+      <div class="step"><strong>0–5</strong> — 2 vías, O₂, cristaloides; muestras (incl. fibrinógeno + pruebas cruzadas); masaje; oxitocina; <strong>TXA 1 g IV</strong>; cuantificar pérdida; 4 T.</div>
+      <div class="step"><strong>5–10</strong> — 2º uterotónico; revisar canal/cavidad; si masiva o no responde → <strong>activar Transfusión Masiva</strong> + avisar pabellón/anestesia/UCI.</div>
+      <div class="step"><strong>10–20</strong> — Balón Bakri; transfundir (fibrinógeno &gt;2 g/L, 1:1:1 inicial); calcio iónico; calentar; repetir TXA si persiste.</div>
+      <div class="step"><strong>20–30</strong> — Si persiste → pabellón (B-Lynch, ligaduras); <strong>histerectomía sin demora</strong>; UCI.</div>
+      <div class="card-sub">Roles, números de contacto y tiempos de respuesta locales se definen en el protocolo institucional (no se incluyen aquí).</div>
+    </div>
+  </div>
+
+  <div id="panel-she" class="hidden">
+    <div class="card">
+      <div class="card-title">1 · Clasificar y detectar severidad</div>
+      <div class="card-sub">PA ≥140/90 (×2, ≥4 h) tras 20 sem. Preeclampsia = HTA + proteinuria, O HTA + un criterio de severidad. <span class="evid" onclick="openRef('acog2020')">ACOG 2020 ↗</span></div>
+      <div class="grid">
+        <div><label class="fld">PAS (mmHg)</label><input id="sbp" type="number" placeholder="ej. 168"></div>
+        <div><label class="fld">PAD (mmHg)</label><input id="dbp" type="number" placeholder="ej. 112"></div>
+        <div><label class="fld">Proteinuria</label><select id="prot"><option value="">—</option><option value="1">Presente (≥300mg / P/C≥0.3 / 2+)</option><option value="0">Ausente</option></select></div>
+        <div><label class="fld">Plaquetas (×10³/µL)</label><input id="plaq" type="number" placeholder="ej. 90"></div>
+        <div><label class="fld">Creatinina (mg/dL)</label><input id="cr" type="number" step="0.1" placeholder="ej. 1.3"></div>
+        <div><label class="fld">AST/ALT (U/L)</label><input id="ast" type="number" placeholder="ej. 80"></div>
+      </div>
+      <div style="margin-top:8px">
+        <span class="toggle"><input type="checkbox" id="sint"> Cefalea/visual o epigastralgia</span>
+        <span class="toggle"><input type="checkbox" id="edema"> Edema pulmonar</span>
+        <span class="toggle"><input type="checkbox" id="eclampsia"> Convulsión (eclampsia)</span>
+      </div>
+      <button class="bs" style="margin-top:12px" onclick="runPE()">Evaluar</button>
+      <div id="pe-res"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">2 · Crisis hipertensiva (PA ≥160/110)</div>
+      <div class="card-sub">Emergencia: tratar en <strong>30–60 min</strong> para reducir el riesgo de ACV materno. <span class="evid" onclick="openRef('acog767')">ACOG CO-767 ↗</span></div>
+      <table><thead><tr><th>Fármaco</th><th>Esquema</th><th>Notas</th></tr></thead><tbody>
+        <tr><td><strong>Labetalol IV</strong></td><td>20 mg → 40 → 80 (c/10 min); máx acumulado ~300 mg</td><td>1ª línea. ⚠️ Evitar en asma, IC, bradicardia</td></tr>
+        <tr><td><strong>Hidralazina IV</strong></td><td>5–10 mg en 2 min; repetir 10 mg c/20 min</td><td>1ª línea. Riesgo de hipotensión materna</td></tr>
+        <tr><td><strong>Nifedipino oral (LI)</strong></td><td>10 mg → 20 mg c/20–30 min</td><td>Si no hay acceso IV</td></tr>
+      </tbody></table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">3 · Sulfato de magnesio (neuroprotección/anticonvulsivante)</div>
+      <div class="card-sub">Indicado en <strong>preeclampsia con criterios de severidad</strong> y en <strong>eclampsia</strong> (profilaxis y tratamiento de convulsiones). <span class="evid" onclick="openRef('magpie')">MAGPIE ↗</span></div>
+      <div class="step"><strong>Carga:</strong> 4–6 g IV en 15–20 min. <strong>Mantenimiento:</strong> 1–2 g/h; continuar 24 h tras el parto o la última convulsión.</div>
+      <div class="step"><strong>Vigilar toxicidad:</strong> reflejos osteotendinosos (se pierden ~9.6–12 mg/dL), frecuencia respiratoria (depresión 12–18) y diuresis. Nivel terapéutico 4–8 mg/dL.</div>
+      <div class="step"><strong>Antídoto:</strong> gluconato de calcio 1 g IV en 3 min. <strong>Precaución renal:</strong> reducir mantenimiento y monitorizar niveles si CrCl baja/oliguria.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">4 · Interrupción del embarazo</div>
+      <div class="step">Preeclampsia <strong>sin</strong> severidad: parto a las <strong>≥37 sem</strong>.</div>
+      <div class="step">Preeclampsia <strong>con</strong> severidad: parto a las <strong>≥34 sem</strong> (o antes si inestabilidad materna/fetal).</div>
+      <div class="step">Eclampsia / HELLP / HTA incontrolable / compromiso fetal: <strong>estabilizar y resolver</strong> sin demora (MgSO₄ + control de PA primero).</div>
+      <div class="callout">El único tratamiento definitivo de la preeclampsia es el parto; el manejo médico estabiliza para resolver en el momento óptimo.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">5 · Anestesia neuroaxial y trombocitopenia (preeclampsia/HELLP)</div>
+      <div class="card-sub">Decisión <strong>anestésica y multidisciplinaria</strong> (riesgo de hematoma espinal-epidural); no es un corte binario. <span class="evid" onclick="openRef('coagobst2026')">Rev Chil Anest 2026 (HHHA) ↗</span></div>
+      <div class="step">Preeclampsia: pedir pruebas de coagulación si <strong>plaquetas &lt;100.000/µL</strong>.</div>
+      <div class="step"><strong>≥70.000/µL</strong>: riesgo bajo, razonable proceder. <strong>50.000–70.000</strong>: individualizar. <strong>&lt;50.000</strong>: razonable evitar. (SOAP/Bauer 2021)</div>
+      <div class="step">Pesa la <strong>tendencia</strong> (descenso rápido) y repite el recuento si es de hace &gt;6 h; en HELLP fulminante, reevaluar antes del procedimiento.</div>
+      <div class="card-sub">Timing perioperatorio de anticoagulantes y dosis de hemoderivados: ver <strong>ETHOS·TX</strong>.</div>
+    </div>
+  </div>
+
+  <div id="panel-sep" class="hidden">
+    <div class="card">
+      <div class="card-title">1 · Tamizaje rápido (omqSOFA)</div>
+      <div class="card-sub">Sepsis materna = disfunción orgánica por infección en embarazo/puerperio. El omqSOFA usa solo datos clínicos. <span class="evid" onclick="openRef('smfm67')">SMFM #67 ↗</span></div>
+      <div class="grid">
+        <div><label class="fld">FR (resp/min)</label><input id="s_fr" type="number" placeholder="ej. 28"></div>
+        <div><label class="fld">PAS (mmHg)</label><input id="s_pas" type="number" placeholder="ej. 88"></div>
+        <div style="display:flex;align-items:flex-end"><span class="toggle"><input type="checkbox" id="s_alt"> Alteración del estado mental</span></div>
+      </div>
+      <div style="font-size:11px;color:var(--tt);margin-top:6px">1 punto c/u: FR &gt;25 · PAS &lt;90 · alteración mental. <strong>≥2 = críticamente enferma.</strong></div>
+      <button class="bs" style="margin-top:10px" onclick="runSepsis()">Evaluar</button>
+      <div id="sep-res"></div>
+      <div class="callout" style="margin-top:10px">⚠️ El embarazo enmascara la sepsis: taquicardia, taquipnea e hipotensión basales son fisiológicas. Un omqSOFA bajo NO la descarta si hay sospecha clínica.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">2 · Bundle hora-1 (Surviving Sepsis 2021)</div>
+      <div class="card-sub">Iniciar de inmediato ante sepsis/shock séptico. <span class="evid" onclick="openRef('ssc2021')">SSC 2021 ↗</span></div>
+      <div class="step"><strong>1.</strong> Medir <strong>lactato</strong> (repetir si &gt;2 mmol/L).</div>
+      <div class="step"><strong>2.</strong> <strong>Hemocultivos ANTES</strong> de los antibióticos.</div>
+      <div class="step"><strong>3.</strong> <strong>Antibiótico de amplio espectro &lt;1 h</strong> (no demorar por los cultivos).</div>
+      <div class="step"><strong>4.</strong> <strong>Cristaloides 30 mL/kg</strong> si hipotensión o lactato ≥4 (en ≤3 h), <strong>con evaluación dinámica de la respuesta</strong> (no bolos ciegos repetidos). <span class="warn">Cautela en preeclampsia/sepsis: alto riesgo de edema pulmonar — no sobrecargar.</span></div>
+      <div class="step"><strong>5.</strong> <strong>Vasopresor precoz</strong> (noradrenalina 1ª línea) si persiste la hipotensión tras la reanimación inicial o hay riesgo de sobrecarga → <strong>MAP ≥65</strong>. No retrasar el vasopresor por seguir dando fluidos.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">3 · Foco y antibióticos empíricos</div>
+      <div class="card-sub">Orientativo; ajustar al protocolo local, alergias y cultivos. El <strong>control del foco</strong> es esencial. <span class="evid" onclick="openRef('smfm67')">SMFM #67 ↗</span></div>
+      <table><thead><tr><th>Foco</th><th>Esquema empírico orientativo</th></tr></thead><tbody>
+        <tr><td><strong>Corioamnionitis</strong> (intraamniótico)</td><td>Ampicilina + gentamicina (+ clindamicina/metronidazol si cesárea)</td></tr>
+        <tr><td><strong>Endometritis</strong> postparto</td><td>Clindamicina + gentamicina</td></tr>
+        <tr><td><strong>Pielonefritis</strong></td><td>Cefalosporina (p. ej. ceftriaxona) — ajustar a cultivo</td></tr>
+        <tr><td><strong>Aborto séptico</strong></td><td>Amplio espectro + <strong>evacuación uterina</strong> (control del foco)</td></tr>
+        <tr><td><strong>ISO / absceso pélvico</strong></td><td>Amplio espectro + drenaje quirúrgico</td></tr>
+      </tbody></table>
+      <div class="callout">🦠 Gérmenes frecuentes: E. coli, estreptococos (incl. GBS/GAS), estafilococos, anaerobios; flora mixta. <strong>Control del foco</strong> (evacuar restos, drenar absceso, retirar dispositivo) tan pronto sea posible.</div>
+    </div>
+  </div>
+
+  <div id="panel-ap" class="hidden"></div>
+
+  <div class="foot">ETHOS Perinatal · Código Rojo/HPP v0.1 · Apoyo clínico · Dr. E. Salvador Moreno · 2026 · PROTOTIPO EN VALIDACIÓN</div>
+</div>
+
+<div class="modal" id="refModal" onclick="if(event.target.id==='refModal')closeRef()">
+  <div class="modal-box"><div id="refBody"></div><div style="text-align:right;margin-top:12px"><button class="bs" onclick="closeRef()">Cerrar</button></div></div>
+</div>
+
+<script>
+// ═══ Registro de evidencia (citas clicables) ═══
+var REFS={
+ 'figo2022':{t:'FIGO 2022 — Manejo de la hemorragia postparto',a:'Escobar MF, et al.',rev:'Int J Gynecol Obstet 2022',url:'https://obgyn.onlinelibrary.wiley.com/doi/10.1002/ijgo.14116',h:'Oxitocina de 1ª línea; TXA <3 h; balón intrauterino si fallan uterotónicos; escalada quirúrgica.'},
+ 'woman':{t:'WOMAN — Ácido tranexámico en HPP',a:'WOMAN Trial Collaborators',rev:'Lancet 2017',url:'https://pubmed.ncbi.nlm.nih.gov/?term=WOMAN%20trial%20tranexamic%20acid%20death%20postpartum%20haemorrhage%20Lancet%202017',h:'TXA 1 g IV reduce la muerte por sangrado en HPP si se da dentro de las 3 h.'},
+ 'emotive':{t:'E-MOTIVE — Detección temprana y paquete de tratamiento',a:'Gallos I, et al.',rev:'N Engl J Med 2023',url:'https://www.nejm.org/doi/full/10.1056/NEJMoa2303966',h:'Sábana calibrada + bundle (masaje, oxitócicos, TXA, fluidos, examen, escalada): ‑60% en HPP grave/laparotomía/muerte.'},
+ 'rcog52':{t:'RCOG Green-top 52 — Prevención y manejo de la HPP',a:'Royal College of Obstetricians and Gynaecologists',rev:'2016/2017',url:'https://www.rcog.org.uk/guidance/browse-all-guidance/green-top-guidelines/prevention-and-management-of-postpartum-haemorrhage-green-top-guideline-no-52/',h:'Dosis de uterotónicos; meta de fibrinógeno; manejo escalonado.'},
+ 'proppr':{t:'PROPPR — Proporción 1:1:1 en transfusión masiva',a:'Holcomb JB, et al.',rev:'JAMA 2015',url:'https://pubmed.ncbi.nlm.nih.gov/?term=Holcomb%202015%20PROPPR%20transfusion%20plasma%20platelets%20red%20blood%20cells%20ratio%20JAMA',h:'1:1:1 (plasma:plaquetas:GR) reduce la muerte por exsanguinación frente a 1:1:2. NOTA: evidencia en TRAUMA, no obstétrica; en HPP la corrección se guía por fibrinógeno/viscoelastometría.'},
+ 'ssc2021':{t:'Surviving Sepsis Campaign 2021',a:'Evans L, et al.',rev:'Crit Care Med / Intensive Care Med 2021',url:'https://pubmed.ncbi.nlm.nih.gov/?term=Surviving%20Sepsis%20Campaign%202021%20international%20guidelines%20management%20sepsis%20septic%20shock%20Evans',h:'Bundle hora-1: lactato, hemocultivos antes de antibióticos, antibiótico amplio espectro <1h, cristaloides 30 mL/kg, vasopresores para MAP ≥65.'},
+ 'smfm67':{t:'SMFM Consult Series #67 — Sepsis materna',a:'Society for Maternal-Fetal Medicine',rev:'Am J Obstet Gynecol 2023',url:'https://pubmed.ncbi.nlm.nih.gov/?term=Society%20for%20Maternal-Fetal%20Medicine%20Consult%20Series%2067%20maternal%20sepsis',h:'omqSOFA (FR>25, PAS<90, alteración mental; ≥2 crítica); cultivos + antibiótico <1h; control del foco; cautela con fluidos en preeclampsia.'},
+ 'whomatsepsis':{t:'WHO — Sepsis materna (definición 2017)',a:'World Health Organization',rev:'WHO 2017',url:'https://www.who.int/publications/i/item/WHO-RHR-17.02',h:'Disfunción orgánica potencialmente mortal por infección en embarazo/parto/puerperio.'},
+ 'acog2020':{t:'ACOG — HTA gestacional y preeclampsia (Practice Bulletin 222)',a:'American College of Obstetricians and Gynecologists',rev:'Obstet Gynecol 2020',url:'https://pubmed.ncbi.nlm.nih.gov/?term=ACOG%20Practice%20Bulletin%20222%20Gestational%20Hypertension%20and%20Preeclampsia%202020',h:'Criterios diagnósticos y de severidad; PA ≥160/110, plaquetas <100k, Cr >1.1, transaminasas ≥2×, edema pulmonar, síntomas cerebrales/visuales.'},
+ 'acog767':{t:'ACOG CO-767 — Terapia de urgencia de la HTA severa en embarazo',a:'ACOG',rev:'Obstet Gynecol 2019',url:'https://pubmed.ncbi.nlm.nih.gov/?term=ACOG%20Committee%20Opinion%20767%20Emergent%20Therapy%20Acute-Onset%20Severe%20Hypertension%20Pregnancy%20Postpartum',h:'Tratar PA ≥160/110 en 30–60 min: labetalol IV, hidralazina IV, o nifedipino oral.'},
+ 'magpie':{t:'MAGPIE — Sulfato de magnesio en preeclampsia',a:'Magpie Trial Collaborative Group',rev:'Lancet 2002',url:'https://pubmed.ncbi.nlm.nih.gov/?term=Magpie%20Trial%20magnesium%20sulphate%20women%20pre-eclampsia%20Lancet%202002',h:'El sulfato de magnesio reduce a la mitad el riesgo de eclampsia. Antídoto de toxicidad: gluconato de calcio.'},
+ 'coagobst2026':{t:'Trastornos de coagulación en la paciente obstétrica (revisión)',a:'Ramírez G, Basso L, Valenzuela A, Gálvez A, Lacassie HJ — HHHA / U. de La Frontera',rev:'Rev Chil Anest 2026;55(3):275-295',url:'https://doi.org/10.25237/revchilanestv55n3-04',h:'Umbral plaquetario para neuroaxial (SOAP/Bauer ≥70.000; pedir coagulación si <100.000 en preeclampsia); fibrinógeno <200 mg/dL predice HPP grave (Charbit).'},
+ 'minsal2015':{t:'Guía Perinatal — MINSAL Chile 2015 (referencia local)',a:'Ministerio de Salud, Chile',rev:'MINSAL 2015',url:'https://www.minsal.cl/',h:'Protocolo nacional chileno de referencia. Nota: precede a WOMAN 2017 y FIGO 2022; para HPP usar la evidencia actual.'}
+};
+function openRef(k){var r=REFS[k];if(!r)return;
+  var link=r.url?('<a class="modal-link" href="'+r.url+'" target="_blank" rel="noopener">Abrir fuente original ↗</a>'):'';
+  document.getElementById('refBody').innerHTML='<div style="font-weight:800;font-size:15px;margin-bottom:8px">'+r.t+'</div>'+
+    '<div style="font-size:13px;line-height:1.7"><strong>Autores:</strong> '+r.a+'<br><strong>Fuente:</strong> '+r.rev+'<br><strong>Hallazgo:</strong> '+r.h+'</div>'+link+
+    '<div style="font-size:11px;color:var(--tt);margin-top:10px">Información educativa; la aplicación clínica depende del contexto del paciente.</div>';
+  document.getElementById('refModal').classList.add('active');}
+function closeRef(){document.getElementById('refModal').classList.remove('active');}
+
+// ═══ Navegación ═══
+function setTab(t){
+  ['cr','she','sep','ap'].forEach(function(x){
+    document.getElementById('tab-'+x).classList.toggle('active',t===x);
+    document.getElementById('panel-'+x).classList.toggle('hidden',t!==x);
+  });
+  if(t==='ap')renderAprender();
+}
+
+// ═══ Lógica de decisión (testeable) ═══
+function shockIndex(fc,pas){ return (fc&&pas)? fc/pas : null; }
+function evalCodigoRojo(perdida, fc, pas, via){
+  const umbral = via==='cesarea'?1000:500;
+  const si = shockIndex(fc,pas);
+  const hpp = (perdida!=null && perdida>=umbral) || (si!=null && si>=0.9);
+  let sev='nada', activar=false;
+  if((perdida!=null&&perdida>=1500) || (si!=null&&si>=1.0) || (pas!=null&&pas<90&&pas>0)){ sev='masiva'; activar=true; }
+  else if(hpp){ sev='hpp'; activar=true; }
+  else if(perdida!=null||fc||pas){ sev='vigilar'; }
+  return {hpp, sev, activar, shockIndex: si!=null? Math.round(si*100)/100 : null, umbral};
+}
+function recomendarUterotonicos(htn, asma){
+  return [
+    {n:'Oxitocina', d:'5 UI IV lenta + infusión 20–40 UI en 500–1000 mL de cristaloide', ok:true, nota:'Primera línea'},
+    {n:'Carbetocina', d:'100 µg IM/IV (análogo de oxitocina, termoestable)', ok:true, nota:''},
+    {n:'Ergometrina / metilergometrina', d:'0.2 mg (200 µg) IM/IV', ok:!htn, nota: htn?'⛔ CONTRAINDICADA en HTA/preeclampsia':'Evitar si hipertensión'},
+    {n:'Carboprost (PGF2α)', d:'0.25 mg (250 µg) IM c/15 min · máx 2 mg (8 dosis)', ok:!asma, nota: asma?'⚠️ Evitar/precaución en asma (broncoespasmo)':'Precaución en asma'},
+    {n:'Misoprostol', d:'800 µg sublingual o rectal (si inyectables no disponibles)', ok:true, nota:'Efectos: fiebre, náusea/diarrea'}
+  ];
+}
+
+// ═══ Render apoyo ═══
+function num(id){var v=document.getElementById(id).value; return v===''?null:parseFloat(v);}
+function runCR(){
+  const r=evalCodigoRojo(num('perdida'),num('fc'),num('pas'),document.getElementById('via').value);
+  let bg,txt,head;
+  if(r.sev==='masiva'){bg='var(--red-bg)';head='<span class="bad">🚨 HEMORRAGIA MASIVA — ACTIVAR CÓDIGO ROJO</span>';}
+  else if(r.sev==='hpp'){bg='var(--red-bg)';head='<span class="bad">🩸 HPP confirmada — ACTIVAR CÓDIGO ROJO</span>';}
+  else if(r.sev==='vigilar'){bg='var(--yellow-bg)';head='<span class="warn">⚠️ Vigilar — por debajo de umbral, reevaluar</span>';}
+  else {bg='var(--bgw)';head='Introduce datos para evaluar.';}
+  let extra='';
+  if(r.shockIndex!=null) extra+='<br>Índice de shock (FC/PAS): <strong>'+r.shockIndex+'</strong> '+(r.shockIndex>=1?'<span class="bad">(≥1: hipovolemia grave)</span>':(r.shockIndex>=0.9?'<span class="warn">(≥0.9: alerta)</span>':'<span class="good">(normal)</span>'));
+  if(r.sev==='hpp'||r.sev==='masiva') extra+='<br>Umbral de HPP para esta vía: ≥'+r.umbral+' mL. → Inicia el <strong>bundle E-MOTIVE</strong> (tarjeta 3) y busca la causa (4 T).';
+  document.getElementById('cr-res').innerHTML='<div class="res" style="background:'+bg+'">'+head+extra+'</div>';
+}
+function runUtero(){
+  const list=recomendarUterotonicos(document.getElementById('htn').checked, document.getElementById('asma').checked);
+  let h='<table><thead><tr><th>Agente</th><th>Dosis</th><th>Estado</th></tr></thead><tbody>';
+  list.forEach(function(u){
+    h+='<tr style="'+(u.ok?'':'opacity:.6')+'"><td><strong>'+u.n+'</strong></td><td>'+u.d+'</td><td>'+(u.ok?'<span class="good">✓ disponible</span>':'<span class="bad">no usar</span>')+(u.nota?'<br><span style="font-size:11px;color:var(--tt)">'+u.nota+'</span>':'')+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  document.getElementById('utero-res').innerHTML=h;
+}
+
+// ═══ Módulo Aprender ═══
+function checkCaso(btn,ok,fbId){
+  btn.parentElement.querySelectorAll('.opt').forEach(function(o){
+    o.classList.remove('correct','wrong');
+    if(o.getAttribute('data-ok')==='1'){o.classList.add('correct'); if(o.getAttribute('data-mk')!=='1'){o.innerHTML='✓ '+o.innerHTML;o.setAttribute('data-mk','1');}}
+    o.style.pointerEvents='none';
+  });
+  if(!ok){btn.classList.add('wrong');btn.innerHTML='✗ '+btn.innerHTML;}
+  var fb=document.getElementById(fbId); if(fb)fb.classList.add('active');
+}
+function renderAprender(){
+  if(document.getElementById('panel-ap').dataset.done==='1')return;
+  var h='';
+
+  // ── Lección 1 · HPP ──
+  h+=`<div class="card"><div class="card-title">Lección 1 · HPP — reconocer y primera respuesta</div>
+  <p>Hemorragia postparto = pérdida ≥500 mL (vaginal) o ≥1000 mL (cesárea), o <em>cualquier</em> sangrado con repercusión hemodinámica. Las causas son las <strong>4 T</strong>: <strong>Tono</strong> (atonía, ~70%), <strong>Trauma</strong> (desgarros, hematoma, rotura), <strong>Tejido</strong> (restos/placenta retenidos, acretismo) y <strong>Trombina</strong> (coagulopatía).</p>
+  <h3>Mecanismo: por qué reconocerla temprano</h3>
+  <p>La gestante compensa la hipovolemia con vasoconstricción y taquicardia, de modo que <strong>la PA cae tarde</strong> (tras perder ~25–30% de la volemia). Por eso el <strong>índice de shock (FC/PAS)</strong> sube antes: ≥0.9 = alerta, ≥1.0 = hipovolemia grave. Además, la estimación visual <strong>subestima</strong> la pérdida; la detección cuantitativa (sábana calibrada) es la base del éxito del bundle E-MOTIVE.</p>
+  <table><thead><tr><th>Paso E-MOTIVE</th><th>Qué hacer</th></tr></thead><tbody>
+  <tr><td><strong>M</strong>asaje</td><td>Masaje uterino bimanual</td></tr>
+  <tr><td><strong>O</strong>xitócicos</td><td>Uterotónicos (Lección 2)</td></tr>
+  <tr><td><strong>T</strong>XA</td><td>1 g IV en &lt;3 h</td></tr>
+  <tr><td><strong>I</strong> fluidos</td><td>Cristaloides, sin sobre-reanimar</td></tr>
+  <tr><td><strong>V</strong> examen</td><td>Buscar la causa (4 T)</td></tr>
+  <tr><td><strong>E</strong>scalada</td><td>Balón, suturas, cirugía</td></tr></tbody></table>
+  <div class="callout">🩺 <strong>Conexión clínica:</strong> el TXA reduce la mortalidad por HPP solo si se da pronto — dentro de las 3 h del inicio del sangrado (la fibrinólisis ya está establecida después). <span class="evid" onclick="openRef('woman')">WOMAN ↗</span> · <span class="evid" onclick="openRef('emotive')">E-MOTIVE ↗</span></div>
+  <div class="step"><strong>⚠️ Errores frecuentes:</strong> estimar la pérdida "a ojo" (subestima); esperar a que baje la PA (signo tardío); dar TXA tarde (&gt;3 h); transfundir solo glóbulos rojos; no buscar la causa con las 4 T; sobre-cargar cristaloides (diluye factores).</div>
+  <div class="caso"><div style="font-weight:700;margin-bottom:6px">📝 Caso 1</div><div>Parto vaginal hace 20 min, sangrado ~700 mL, FC 110, PAS 100. ¿Conducta?</div>
+  <div class="opt" data-ok="1" onclick="checkCaso(this,true,'fbL1')">Activar código rojo e iniciar el bundle E-MOTIVE buscando la causa (4 T)</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL1')">Observar; 700 mL es normal tras parto vaginal</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL1')">Ir directo a histerectomía</div>
+  <div class="fb" id="fbL1"><strong>Correcto.</strong> 700 mL supera el umbral vaginal de 500 mL y hay taquicardia: es HPP. Bundle E-MOTIVE inmediato + causa.</div></div>
+  <div class="caso"><div style="font-weight:700;margin-bottom:6px">📝 Caso 2</div><div>Te dicen "pérdida ~400 mL" tras parto vaginal, pero la paciente está pálida, FC 122 y PAS 95 (índice de shock 1.28). ¿Qué pesa más?</div>
+  <div class="opt" data-ok="1" onclick="checkCaso(this,true,'fbL1b')">El índice de shock y la clínica: tratar como hemorragia grave (la estimación visual subestima)</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL1b')">El número 400 mL: por debajo del umbral, observar</div>
+  <div class="fb" id="fbL1b"><strong>Correcto.</strong> La estimación visual subestima; un índice de shock ≥1.0 indica hipovolemia grave. Se actúa según la clínica, no según el "ojo".</div></div>
+  <div style="background:var(--green-bg);padding:8px 11px;border-radius:6px;font-size:11px;border-left:3px solid var(--green)">📖 <span class="evid" onclick="openRef('figo2022')">FIGO 2022</span> · <span class="evid" onclick="openRef('emotive')">E-MOTIVE 2023</span> · <span class="evid" onclick="openRef('woman')">WOMAN 2017</span></div></div>`;
+
+  // ── Lección 2 · Uterotónicos ──
+  h+=`<div class="card"><div class="card-title">Lección 2 · Uterotónicos — mecanismo y contraindicaciones</div>
+  <p>Tratar la atonía (Tono) con uterotónicos escalonados. Conocer el <strong>mecanismo</strong> de cada clase explica sus contraindicaciones.</p>
+  <table><thead><tr><th>Agente (clase)</th><th>Dosis</th><th>Clave de seguridad</th></tr></thead><tbody>
+  <tr><td><strong>Oxitocina</strong> (receptor de oxitocina)</td><td>5 UI IV lenta + 20–40 UI en 500–1000 mL</td><td>1ª línea</td></tr>
+  <tr><td><strong>Carbetocina</strong> (análogo termoestable)</td><td>100 µg IM/IV</td><td>Larga duración</td></tr>
+  <tr><td><strong>Ergometrina</strong> (alcaloide del ergot, vasoconstrictor)</td><td>0.2 mg IM/IV</td><td><span class="bad">⛔ HTA/preeclampsia</span> (crisis hipertensiva)</td></tr>
+  <tr><td><strong>Carboprost</strong> (PGF2α, broncoconstrictor)</td><td>0.25 mg IM c/15 min, máx 2 mg</td><td><span class="warn">⚠️ Asma</span> (broncoespasmo); fiebre</td></tr>
+  <tr><td><strong>Misoprostol</strong> (PGE1)</td><td>800 µg SL/rectal</td><td>Fiebre, escalofríos; si no hay inyectables</td></tr></tbody></table>
+  <div class="callout">🩺 <strong>Conexión clínica:</strong> la ergometrina es vasoconstrictora → contraindicada en HTA; el carboprost (PGF2α) es broncoconstrictor → evitar en asma. La <em>fisiología del fármaco</em> predice la contraindicación. <span class="evid" onclick="openRef('figo2022')">FIGO 2022 ↗</span></div>
+  <div class="step"><strong>⚠️ Errores frecuentes:</strong> ergometrina en preeclampsia; carboprost en asmática; usar misoprostol como 1ª línea habiendo inyectables; confundir dosis de profilaxis con las de tratamiento.</div>
+  <div class="caso"><div style="font-weight:700;margin-bottom:6px">📝 Caso 1</div><div>HPP por atonía en una paciente con <strong>preeclampsia</strong>; la oxitocina no controla. ¿Qué uterotónico EVITAS?</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL2')">Carboprost</div>
+  <div class="opt" data-ok="1" onclick="checkCaso(this,true,'fbL2')">Ergometrina / metilergometrina</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL2')">Misoprostol</div>
+  <div class="fb" id="fbL2"><strong>Correcto.</strong> La ergometrina está contraindicada en HTA/preeclampsia (crisis hipertensiva). Se prefiere carboprost (si no hay asma) o misoprostol.</div></div>
+  <div class="caso"><div style="font-weight:700;margin-bottom:6px">📝 Caso 2</div><div>HPP por atonía en una paciente <strong>asmática</strong> normotensa. La oxitocina no basta. ¿Qué evitas?</div>
+  <div class="opt" data-ok="1" onclick="checkCaso(this,true,'fbL2b')">Carboprost (PGF2α)</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL2b')">Ergometrina</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL2b')">Carbetocina</div>
+  <div class="fb" id="fbL2b"><strong>Correcto.</strong> El carboprost puede causar broncoespasmo: evitar en asma. Aquí, sin HTA, la ergometrina es una opción válida.</div></div>
+  <div style="background:var(--green-bg);padding:8px 11px;border-radius:6px;font-size:11px;border-left:3px solid var(--green)">📖 <span class="evid" onclick="openRef('figo2022')">FIGO 2022</span> · <span class="evid" onclick="openRef('rcog52')">RCOG 52</span></div></div>`;
+
+  // ── Lección 3 · Preeclampsia/eclampsia ──
+  h+=`<div class="card"><div class="card-title">Lección 3 · Preeclampsia con severidad y eclampsia</div>
+  <p>Preeclampsia = HTA tras 20 sem + proteinuria, O HTA + un <strong>criterio de severidad</strong>. Mecanismo: disfunción endotelial de origen placentario → vasoespasmo, daño renal/hepático, edema.</p>
+  <table><thead><tr><th>Criterios de severidad (ACOG 2020)</th></tr></thead><tbody>
+  <tr><td>PA ≥160/110 · plaquetas &lt;100k · creatinina &gt;1.1 · transaminasas ≥2× · edema pulmonar · síntomas cerebrales/visuales o epigastralgia</td></tr></tbody></table>
+  <h3>Dos urgencias que salvan vidas</h3>
+  <table><thead><tr><th>Crisis hipertensiva (≥160/110)</th><th>Sulfato de magnesio</th></tr></thead><tbody>
+  <tr><td>Tratar en <strong>30–60 min</strong> (riesgo de ACV): labetalol 20→40→80 mg (evitar asma), hidralazina 5–10 mg, o nifedipino oral 10→20 mg</td><td>Carga 4–6 g IV + 1–2 g/h. Antídoto <strong>gluconato de calcio 1 g</strong>. Vigilar reflejos, FR y diuresis</td></tr></tbody></table>
+  <div class="callout">🩺 <strong>Conexión clínica:</strong> el sulfato de magnesio reduce a la mitad el riesgo de eclampsia y es el anticonvulsivante de elección en la eclampsia — no las benzodiacepinas. <span class="evid" onclick="openRef('magpie')">MAGPIE ↗</span></div>
+  <div class="step"><strong>⚠️ Errores frecuentes:</strong> usar benzodiacepinas/fenitoína en vez de MgSO₄ en la eclampsia; demorar el tratamiento de la PA ≥160/110; olvidar el monitoreo/antídoto del MgSO₄; fluidos liberales (edema pulmonar).</div>
+  <div class="caso"><div style="font-weight:700;margin-bottom:6px">📝 Caso 1</div><div>35 sem, <strong>convulsión</strong> tónico-clónica y PA 170/115. ¿Anticonvulsivante de elección?</div>
+  <div class="opt" data-ok="1" onclick="checkCaso(this,true,'fbL3')">Sulfato de magnesio (carga 4–6 g + 1–2 g/h)</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL3')">Diazepam/lorazepam de primera línea</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL3')">Fenitoína</div>
+  <div class="fb" id="fbL3"><strong>Correcto.</strong> En eclampsia, MgSO₄ es de elección (MAGPIE). Además trata la PA ≥160/110 en 30–60 min y prepara la resolución. Antídoto: gluconato de calcio.</div></div>
+  <div class="caso"><div style="font-weight:700;margin-bottom:6px">📝 Caso 2</div><div>Preeclampsia, PA 168/112 sostenida, sin convulsiones. ¿Cuándo tratar la PA?</div>
+  <div class="opt" data-ok="1" onclick="checkCaso(this,true,'fbL3b')">De inmediato, dentro de 30–60 min (riesgo de ACV materno)</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL3b')">Solo si aparecen síntomas</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL3b')">Tras 24 h de observación</div>
+  <div class="fb" id="fbL3b"><strong>Correcto.</strong> La PA ≥160/110 sostenida es una emergencia: tratar en 30–60 min con labetalol/hidralazina IV o nifedipino oral para reducir el riesgo de ictus.</div></div>
+  <div style="background:var(--green-bg);padding:8px 11px;border-radius:6px;font-size:11px;border-left:3px solid var(--green)">📖 <span class="evid" onclick="openRef('acog2020')">ACOG 2020</span> · <span class="evid" onclick="openRef('acog767')">ACOG CO-767</span> · <span class="evid" onclick="openRef('magpie')">MAGPIE</span></div></div>`;
+
+  // ── Lección 4 · Sepsis ──
+  h+=`<div class="card"><div class="card-title">Lección 4 · Sepsis obstétrica — la hora-1</div>
+  <p>Sepsis materna = disfunción orgánica por infección en embarazo/puerperio. <strong>Mecanismo del retraso diagnóstico:</strong> los cambios fisiológicos del embarazo (taquicardia, taquipnea e hipotensión basales) <em>enmascaran</em> la sepsis, y el lactato puede elevarse por otras causas.</p>
+  <h3>Tamizaje rápido: omqSOFA</h3>
+  <p>1 punto c/u: <strong>FR &gt;25</strong>, <strong>PAS &lt;90</strong>, <strong>alteración mental</strong>. <strong>≥2 = críticamente enferma.</strong> Un omqSOFA bajo NO descarta sepsis si hay sospecha clínica. <span class="evid" onclick="openRef('smfm67')">SMFM #67 ↗</span></p>
+  <div class="callout">🩺 <strong>Bundle hora-1 (SSC 2021):</strong> lactato · <strong>hemocultivos ANTES</strong> de antibióticos · <strong>antibiótico de amplio espectro &lt;1 h</strong> · cristaloides 30 mL/kg (cautela si preeclampsia) · vasopresores (MAP ≥65). El <strong>control del foco</strong> es decisivo. <span class="evid" onclick="openRef('ssc2021')">SSC 2021 ↗</span></div>
+  <table><thead><tr><th>Foco</th><th>Antibiótico empírico orientativo</th></tr></thead><tbody>
+  <tr><td>Corioamnionitis</td><td>Ampicilina + gentamicina</td></tr>
+  <tr><td>Endometritis postparto</td><td>Clindamicina + gentamicina</td></tr>
+  <tr><td>Aborto séptico</td><td>Amplio espectro + evacuación uterina</td></tr></tbody></table>
+  <div class="step"><strong>⚠️ Errores frecuentes:</strong> esperar los cultivos para iniciar el antibiótico; descartar sepsis por signos "normales" del embarazo; olvidar el control del foco; sobre-cargar fluidos en la preeclámptica (edema pulmonar).</div>
+  <div class="caso"><div style="font-weight:700;margin-bottom:6px">📝 Caso 1</div><div>Puérpera día 3, fiebre 39°C, FR 28, PAS 88, confusa (sospecha endometritis). ¿Conducta inmediata?</div>
+  <div class="opt" data-ok="1" onclick="checkCaso(this,true,'fbL4')">Hemocultivos y antibiótico de amplio espectro en &lt;1 h, lactato, fluidos y control del foco</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL4')">Esperar el resultado de los cultivos antes del antibiótico</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL4')">Antipirético y observar 24 h</div>
+  <div class="fb" id="fbL4"><strong>Correcto.</strong> omqSOFA = 3: críticamente enferma. No se demora el antibiótico por los cultivos; se sacan cultivos y se da amplio espectro en &lt;1 h (endometritis: clindamicina + gentamicina) con control del foco.</div></div>
+  <div class="caso"><div style="font-weight:700;margin-bottom:6px">📝 Caso 2</div><div>Sospecha de pielonefritis; FR 22, PAS 110, lúcida (omqSOFA 0). ¿Qué haces?</div>
+  <div class="opt" data-ok="1" onclick="checkCaso(this,true,'fbL4b')">No descartar sepsis por el omqSOFA bajo; vigilar, tomar cultivos/lactato y tratar la infección</div>
+  <div class="opt" data-ok="0" onclick="checkCaso(this,false,'fbL4b')">Alta: omqSOFA 0 excluye sepsis</div>
+  <div class="fb" id="fbL4b"><strong>Correcto.</strong> El omqSOFA es de tamizaje; un puntaje bajo no excluye sepsis ante sospecha clínica (el embarazo enmascara). Vigilancia y tratamiento de la infección.</div></div>
+  <div style="background:var(--green-bg);padding:8px 11px;border-radius:6px;font-size:11px;border-left:3px solid var(--green)">📖 <span class="evid" onclick="openRef('ssc2021')">Surviving Sepsis 2021</span> · <span class="evid" onclick="openRef('smfm67')">SMFM #67</span> · <span class="evid" onclick="openRef('whomatsepsis')">WHO 2017</span></div></div>`;
+
+  document.getElementById('panel-ap').innerHTML=h;
+  document.getElementById('panel-ap').dataset.done='1';
+}
+
+// ═══ Preeclampsia / SHE (testeable) ═══
+function crisisHipertensiva(sbp,dbp){ return (sbp!=null&&sbp>=160)||(dbp!=null&&dbp>=110); }
+function evalPreeclampsia(sbp,dbp,prot,plaq,cr,ast,sint,edema,eclampsia){
+  if(eclampsia) return {dx:'Eclampsia (convulsión) — emergencia', severo:true, motivos:['Convulsión']};
+  const htaRango=(sbp!=null&&sbp>=140)||(dbp!=null&&dbp>=90);
+  const motivos=[];
+  if((sbp!=null&&sbp>=160)||(dbp!=null&&dbp>=110)) motivos.push('PA ≥160/110');
+  if(plaq!=null&&plaq<100) motivos.push('Plaquetas <100k');
+  if(cr!=null&&cr>1.1) motivos.push('Creatinina >1.1 mg/dL');
+  if(ast!=null&&ast>=70) motivos.push('Transaminasas ≥2× (≥70 U/L)');
+  if(sint) motivos.push('Síntomas cerebrales/visuales o epigastralgia');
+  if(edema) motivos.push('Edema pulmonar');
+  const severo=motivos.length>0;
+  let dx;
+  if(!htaRango) dx='PA <140/90 — sin criterio de HTA; reevaluar';
+  else if(prot||severo) dx= severo?'Preeclampsia CON criterios de severidad':'Preeclampsia';
+  else dx='Hipertensión gestacional (sin proteinuria ni severidad)';
+  return {dx, severo, motivos};
+}
+function mgIndicado(severo,eclampsia){ return !!(severo||eclampsia); }
+function runPE(){
+  const g=function(id){var v=document.getElementById(id).value;return v===''?null:parseFloat(v);};
+  const prot=document.getElementById('prot').value==='1';
+  const r=evalPreeclampsia(g('sbp'),g('dbp'),prot,g('plaq'),g('cr'),g('ast'),
+    document.getElementById('sint').checked,document.getElementById('edema').checked,document.getElementById('eclampsia').checked);
+  const crisis=crisisHipertensiva(g('sbp'),g('dbp'));
+  const mg=mgIndicado(r.severo,document.getElementById('eclampsia').checked);
+  let bg=r.severo?'var(--red-bg)':(/Preeclampsia|gestacional/.test(r.dx)?'var(--yellow-bg)':'var(--bgw)');
+  let h='<div class="res" style="background:'+bg+'"><strong>'+(r.severo?'<span class="bad">':'<span class="warn">')+r.dx+'</span></strong>';
+  if(r.motivos.length) h+='<br>Criterios de severidad: '+r.motivos.join(' · ');
+  if(crisis) h+='<br><span class="bad">🚨 Crisis hipertensiva (≥160/110): tratar en 30–60 min</span> (tarjeta 2)';
+  if(mg) h+='<br><span class="bad">→ Sulfato de magnesio indicado</span> (tarjeta 3)';
+  if(!r.severo&&/Preeclampsia|gestacional/.test(r.dx)) h+='<br>Sin criterios de severidad: vigilancia estrecha, control de PA y de laboratorio.';
+  h+='</div>';
+  document.getElementById('pe-res').innerHTML=h;
+}
+// ═══ Sepsis obstétrica (testeable) ═══
+function omqSOFA(fr,pas,alterado){
+  let sc=0; if(fr!=null&&fr>25)sc++; if(pas!=null&&pas<90)sc++; if(alterado)sc++;
+  return {score:sc, alto:sc>=2};
+}
+function runSepsis(){
+  const g=function(id){var v=document.getElementById(id).value;return v===''?null:parseFloat(v);};
+  const r=omqSOFA(g('s_fr'),g('s_pas'),document.getElementById('s_alt').checked);
+  let bg=r.alto?'var(--red-bg)':'var(--yellow-bg)';
+  let h='<div class="res" style="background:'+bg+'"><strong>omqSOFA = '+r.score+'/3</strong> — '+
+    (r.alto?'<span class="bad">≥2: críticamente enferma → iniciar el bundle hora-1 (tarjeta 2), cultivos + antibiótico &lt;1 h y control del foco</span>'
+           :'<span class="warn">&lt;2: si hay sospecha clínica de infección, NO la descartes; vigila y reevalúa</span>')+'</div>';
+  document.getElementById('sep-res').innerHTML=h;
+}
+// init
+runUtero();
+if(typeof globalThis!=='undefined'){ globalThis.__P={evalCodigoRojo,recomendarUterotonicos,shockIndex,evalPreeclampsia,crisisHipertensiva,mgIndicado,omqSOFA}; }
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
+</body>
+</html>
